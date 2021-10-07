@@ -8,6 +8,8 @@ router.get('/', (req, res) => {
     res.send('User API route')
 })
 
+const { TOKEN_KEY } = process.env.TOKEN_KEY
+
 router.post('/register', async (req, res) => {
     try {
         // Get and validate input
