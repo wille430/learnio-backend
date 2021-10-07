@@ -3,9 +3,9 @@ const app = express()
 require('dotenv')
 require('./config/database').connect()
 
-const userRoute = require('./routes/user')
+const userRouter = require('./routes/user')
 
-app.use(userRoute)
+app.use('/user', userRouter)
 
 app.get('/', (req, res) => {
     res.send('Welcome to Express js')

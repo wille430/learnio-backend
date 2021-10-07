@@ -5,6 +5,10 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const User = require('../models/User')
 
+router.get('/', (req, res) => {
+    res.send('User API route')
+})
+
 router.post('/register', async (req, res) => {
     try {
         // Get and validate input
