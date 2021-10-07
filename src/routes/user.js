@@ -19,7 +19,7 @@ router.post('/register', async (req, res) => {
         if (oldUser) return res.status(409).send('Username already exists')
 
         const user = await User.create({
-            username, password: bcrypt.hash(password, 10)
+            username, password: await bcrypt.hash(password, 10)
         })
 
         // Create JWT-token
@@ -43,7 +43,7 @@ router.post('/login', async (req, res) => {
         if (!(username, password)) return res.status(400).send('All fields are required')
 
         // Find matching username
-        const oldUser = User.findOne({ username })
+        const oldUser = await User.findOne({ username })
         if (!oldUser) return res.status(404).send('Username does not exist')
 
         // Check if password matches
