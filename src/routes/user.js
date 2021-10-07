@@ -1,6 +1,5 @@
 const express = require('express')
 const router = express.Router()
-const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const User = require('../models/User')
@@ -16,7 +15,7 @@ router.post('/register', async (req, res) => {
         if (!(username && password)) return res.status(400).send('Username and password is required')
 
         // Look for existing user
-        const oldUser = await mongoose.findOne({ username })
+        const oldUser = await User.findOne({ username })
         if (oldUser) return res.status(409).send('Username already exists')
 
         const user = await User.create({
@@ -44,7 +43,7 @@ router.post('/login', async (req, res) => {
         if (!(username, password)) return res.status(400).send('All fields are required')
 
         // Find matching username
-        const oldUser = mongoose.findOne({ username })
+        const oldUser = User.findOne({ username })
         if (!oldUser) return res.status(404).send('Username does not exist')
 
         // Check if password matches
