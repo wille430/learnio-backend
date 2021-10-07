@@ -50,7 +50,7 @@ router.post('/login', async (req, res) => {
         if (!bcrypt.compareSync(password, oldUser.password)) return res.status(401).send('Password is incorrect')
 
         // Create jwt token
-        const token = jwt.sign({ user_id: user._id }, TOKEN_KEY, {
+        const token = jwt.sign({ user_id: oldUser._id }, TOKEN_KEY, {
             expiresIn: "2h"
         })
 
