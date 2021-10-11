@@ -1,9 +1,11 @@
 const mongoose = require('mongoose')
+import { projectSchema } from '../models/Project'
 
 const userSchema = new mongoose.Schema({
     username: {type: String, unique: true},
     password: {type: String},
-    token: {type: String}
+    token: {type: String},
+    projects: [projectSchema]
 })
 
-module.exports = mongoose.model("user", userSchema)
+export default mongoose.model("user", userSchema)

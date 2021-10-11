@@ -12,10 +12,8 @@ app.use(express.urlencoded({ extended: false }))
 
 
 const userRouter = require('./routes/user')
-const projectsRouter = require('./routes/projects')
 
 app.use('/user', userRouter)
-app.use('/user/projects', projectsRouter)
 
 app.get('/', (req, res) => {
     res.send('Welcome to Express js')

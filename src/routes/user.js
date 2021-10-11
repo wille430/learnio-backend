@@ -1,70 +1,28 @@
 const express = require('express')
 const router = express.Router()
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcryptjs')
-const User = require('../models/User')
+const authenticateJWT = require('../services/authenticateJWT')
+const { check } = require('express-validator')
 
-router.get('/', (req, res) => {
-    res.send('User API route')
-})
+const { default: User } = require('../controllers/User')
+const { default: Project } = require('../controllers/Project')
+const { default: Technique } = require('../controllers/Technique')
+const { default: ActiveRecall } = require('../controllers/ActiveRecall')
 
-const { TOKEN_KEY } = process.env
+router.post('/register', User.create)
+router.post('/login', User.login)
 
-router.post('/register', async (req, res) => {
-    try {
-        // Get and validate input
-        const { username, password } = req.body
-        if (!(username && password)) return res.status(400).send('Username and password is required')
+// Projects
+router.get('/projects', authenticateJWT, Project.getAll)
+router.post('/projects', authenticateJWT, Project.create)
+router.delete('/projects/:id', authenticateJWT, Project.delete)
 
-        // Look for existing user
-        const oldUser = await User.findOne({ username })
-        if (oldUser) return res.status(409).send('Username already exists')
+// Techniques
+router.get('/projects/:id/techniques', authenticateJWT, Technique.getAll)
+router.post('/projects/:id/techniques', authenticateJWT, Technique.create)
 
-        const user = await User.create({
-            username, password: await bcrypt.hash(password, 10)
-        })
-
-        // Create JWT-token
-        const token = jwt.sign({ user_id: user._id }, TOKEN_KEY, {
-            expiresIn: "2h"
-        })
-
-        user.token = token
-
-        // Return token
-        res.status(201).json(user)
-    } catch (e) {
-        console.log(e)
-    }
-})
-
-router.post('/login', async (req, res) => {
-    try {
-        // Validate input
-        const { username, password } = req.body
-        if (!(username, password)) return res.status(400).send('All fields are required')
-
-        // Find matching username
-        const oldUser = await User.findOne({ username })
-        if (!oldUser) return res.status(404).send('Username does not exist')
-
-        // Check if password matches
-        if (!bcrypt.compareSync(password, oldUser.password)) return res.status(401).send('Password is incorrect')
-
-        // Create jwt token
-        const token = jwt.sign({ user_id: oldUser._id }, TOKEN_KEY, {
-            expiresIn: "2h"
-        })
-
-        oldUser.token = token
-        oldUser.save()
-
-        res.status(200).send(token)
-
-
-    } catch (e) {
-        console.log(e)
-    }
-})
+// Specific technique
+router.get('/projects/:project_id/:technique_id', authenticateJWT, Technique.getFromId)
+router.post('/projects/:project_id/:technique_id/active_recall', authenticateJWT, ActiveRecall.createFlashcard)
+router.delete('/projects/:project_id/:technique_id/active_recall/:flashcard_id', authenticateJWT, ActiveRecall.removeFlashcard)
 
 module.exports = router
