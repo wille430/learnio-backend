@@ -53,34 +53,41 @@ const User = {
     delete: async (req: Express.Request, res: Express.Response) => {
         // Delete user
     },
-    login: async (req: any, res: any) => {
-        try {
-            // Validate username and password
-            const { username, password } = req.body
-            if (!(username && password)) return res.status(400).send('All inputs are required')
+    login: [
+        check('username', 'Username is required')
+            .exists(),
+        check('password')
+            .exists()
+            .withMessage('Password is required'),
+        async (req: any, res: any) => {
+            try {
+                // Validate username and password
+                const { username, password } = req.body
+                console.log({username, password})
 
-            // Check for existing user
-            const oldUser = await UserModel.findOne({ username })
-            if (!oldUser) return res.status(404).send('User does\'nt exist')
+                // Check for existing user
+                const oldUser = await UserModel.findOne({ username })
+                if (!oldUser) return res.status(404).send('User does\'nt exist')
 
-            // Check if password is matching
-            if (!bcrypt.compare(oldUser.password, password)) return res.status(401).send('Incorrect password')
+                // Check if password is matching
+                if (!bcrypt.compare(oldUser.password, password)) return res.status(401).send('Incorrect password')
 
-            // Create new JWT
-            const token = jwt.sign({ user_id: oldUser._id, email: oldUser.email }, process.env.TOKEN_KEY, {
-                expiresIn: "2h",
-            })
+                // Create new JWT
+                const token = jwt.sign({ user_id: oldUser._id, email: oldUser.email }, process.env.TOKEN_KEY, {
+                    expiresIn: "2h",
+                })
 
-            // Save JWT to user
-            oldUser.token = token
-            oldUser.save()
+                // Save JWT to user
+                oldUser.token = token
+                oldUser.save()
 
-            res.status(200).send(token)
-        } catch (e) {
-            console.log(e)
-            res.sendStatus(500)
+                res.status(200).send(token)
+            } catch (e) {
+                console.log(e)
+                res.sendStatus(500)
+            }
         }
-    }
+    ]
 }
 
 export default User
