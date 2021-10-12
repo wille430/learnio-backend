@@ -60,10 +60,15 @@ const User = {
             .exists()
             .withMessage('Password is required'),
         async (req: any, res: any) => {
+            // Validate input
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+                return res.status(422).jsonp(errors.array())
+            }
             try {
                 // Validate username and password
                 const { username, password } = req.body
-                console.log({username, password})
+                console.log({ username, password })
 
                 // Check for existing user
                 const oldUser = await UserModel.findOne({ username })
