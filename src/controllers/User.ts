@@ -25,19 +25,6 @@ const User = {
             .withMessage('Lösenordet kan inte vara tomt')
             .isStrongPassword()
             .withMessage('Lösenord är för svakt. Använd ett starkare lösenord'),
-        check('email')
-            .exists()
-            .withMessage('Mejlfältet kan inte vara tomt')
-            .isEmail()
-            .withMessage('Mejlen är inte giltig')
-            .custom(async email => {
-                const emailExists = await User.isFieldInUse('email', email)
-                if (emailExists) {
-                    throw new Error('E-posten är upptagen')
-                } else {
-                    return true
-                }
-            }),
         async (req: any, res: any) => {
             // Validate input
             const errors = validationResult(req)
