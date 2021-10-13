@@ -53,7 +53,7 @@ const User = {
                 user.token = token
 
                 // Return token
-                res.status(201).json(user)
+                res.status(201).send(token)
             } catch (e) {
                 console.log(e)
                 res.sendStatus(500)
