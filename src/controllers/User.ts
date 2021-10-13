@@ -7,14 +7,37 @@ const { TOKEN_KEY } = process.env
 
 const User = {
     create: [
-        check('username', 'Username must be longer than 3 characters long')
+        check('username')
             .exists()
-            .isLength({ min: 3 }),
+            .withMessage('Användarnamnet kan inte vara tomt')
+            .isLength({ min: 3 })
+            .withMessage('Användarnamnet måste minst innehålla 3 bokstäver')
+            .custom(async username => {
+                const usernameExists = await User.isFieldInUse('username', username)
+                if (usernameExists) {
+                    throw new Error('Användarnamnet är upptaget')
+                } else {
+                    return true
+                }
+            }),
         check('password')
             .exists()
-            .withMessage('Password is required')
+            .withMessage('Lösenordet kan inte vara tomt')
             .isStrongPassword()
-            .withMessage('Password not strong enough'),
+            .withMessage('Lösenord är för svakt. Använd ett starkare lösenord'),
+        check('email')
+            .exists()
+            .withMessage('Mejlfältet kan inte vara tomt')
+            .isEmail()
+            .withMessage('Mejlen är inte giltig')
+            .custom(async email => {
+                const emailExists = await User.isFieldInUse('email', email)
+                if (emailExists) {
+                    throw new Error('E-posten är upptagen')
+                } else {
+                    return true
+                }
+            }),
         async (req: any, res: any) => {
             // Validate input
             const errors = validationResult(req)
@@ -25,11 +48,6 @@ const User = {
             try {
                 // Get and validate input
                 const { username, password } = req.body
-                if (!(username && password)) return res.status(400).send('Username and password is required')
-
-                // Look for existing user
-                const oldUser = await UserModel.findOne({ username })
-                if (oldUser) return res.status(409).send('Username already exists')
 
                 const user = await UserModel.create({
                     username, password: await bcrypt.hash(password, 10)
@@ -54,11 +72,28 @@ const User = {
         // Delete user
     },
     login: [
-        check('username', 'Username is required')
-            .exists(),
+        check('username')
+            .exists()
+            .withMessage('Användarnamnet kan inte vara tomt')
+            .custom(async username => {
+                const userExists = await User.isFieldInUse('username', username)
+                if (!userExists) {
+                    throw new Error('Felaktigt användarnamn eller lösenord')
+                } else {
+                    return true
+                }
+            }),
         check('password')
             .exists()
-            .withMessage('Password is required'),
+            .withMessage('Lösenordet kan inte vara tomt')
+            .custom(async (password, { req }) => {
+                const validPassword = await User.isValidPassword(req.body.username, password)
+                if (!validPassword) {
+                    throw new Error('Felaktigt användarnamn eller lösenord')
+                } else {
+                    return false
+                }
+            }),
         async (req: any, res: any) => {
             // Validate input
             const errors = validationResult(req)
@@ -70,21 +105,17 @@ const User = {
                 const { username, password } = req.body
                 console.log({ username, password })
 
-                // Check for existing user
-                const oldUser = await UserModel.findOne({ username })
-                if (!oldUser) return res.status(404).send('User does\'nt exist')
-
-                // Check if password is matching
-                if (!bcrypt.compare(oldUser.password, password)) return res.status(401).send('Incorrect password')
+                // Get existing user
+                const user = await UserModel.findOne({ username })
 
                 // Create new JWT
-                const token = jwt.sign({ user_id: oldUser._id, email: oldUser.email }, process.env.TOKEN_KEY, {
+                const token = jwt.sign({ user_id: user._id, email: user.email }, process.env.TOKEN_KEY, {
                     expiresIn: "2h",
                 })
 
                 // Save JWT to user
-                oldUser.token = token
-                oldUser.save()
+                user.token = token
+                user.save()
 
                 res.status(200).send(token)
             } catch (e) {
@@ -92,7 +123,19 @@ const User = {
                 res.sendStatus(500)
             }
         }
-    ]
+    ],
+    isFieldInUse: async (field: string, value: string) => {
+        // Check for existing user
+        const oldUser = await UserModel.findOne({ [field]: value })
+        return !!oldUser
+    },
+    isValidPassword: async (username: string, password: string) => {
+        // Check for existing user
+        const user = await UserModel.findOne({ username })
+        if (!user) return false
+        // Compare passwords
+        return bcrypt.compare(user.password, password)
+    },
 }
 
 export default User
