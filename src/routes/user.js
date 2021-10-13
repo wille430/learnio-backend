@@ -8,8 +8,10 @@ const { default: Project } = require('../controllers/Project')
 const { default: Technique } = require('../controllers/Technique')
 const { default: ActiveRecall } = require('../controllers/ActiveRecall')
 
+// User Auth
 router.post('/register', User.create)
 router.post('/login', User.login)
+router.post('/validateToken', User.validateToken)
 
 // Projects
 router.get('/projects', authenticateJWT, Project.getAll)

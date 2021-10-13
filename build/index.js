@@ -1,9 +1,11 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 require('dotenv').config();
 require('./config/database').connect();
 const checkEnv = require('check-env');
 checkEnv(['TOKEN_KEY']);
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 const userRouter = require('./routes/user');
