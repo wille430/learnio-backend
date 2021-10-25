@@ -1,5 +1,6 @@
-import { check } from "express-validator"
+import { check, validationResult } from "express-validator"
 import getUserFromId from "../services/getUserFromId"
+import User from "./User"
 
 
 const Project = {
@@ -8,12 +9,25 @@ const Project = {
             .exists()
             .withMessage('You must name your project'),
         check('selectedTechniques')
-            .isArray()
-            .withMessage('Invalid input'),
+            .isArray({ min: 1 })
+            .withMessage('You must select a technique')
+            .custom(selectedTechniques => {
+                const enums = ['spaced_repetition', 'feynman_technique', 'intervalled_training']
+                let valid_input = selectedTechniques.every(x => enums.includes(x))
+
+                if (!valid_input) {
+                    throw new Error("Invalid techniques. Valid techniques are: spaced_repetition, feynman_technique, intervalled_training")
+                }
+                return true
+            }),
         async (req: any, res: any) => {
             // Validate req
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+                return res.status(422).jsonp(errors.array())
+            }
+
             const { title, selectedTechniques } = req.body
-            if (!(title && selectedTechniques) || !Array.isArray(selectedTechniques)) return res.status(400).send('Missing required fields')
 
             // Get user and create new project
             const user = await getUserFromId(req, res)
@@ -53,6 +67,30 @@ const Project = {
 
         res.status(200).json(projects)
     },
+    validateTechniqueId: [
+        check("technique_id", "Technique ID cannot be empty")
+            .exists(),
+        User.validateProjectId,
+        async (req, res, next) => {
+            // Validate req
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+                return res.status(422).jsonp(errors.array())
+            }
+            const { technique_id } = req.params
+
+            // Get technique
+            const { project } = req
+            console.log({ project })
+            let technique;
+            Object.keys(project.techniques).forEach(tech_type => {
+                project.techniques[tech_type].forEach(tech => tech.id === technique_id ? technique = tech : false)
+            })
+            if (!technique) return res.sendStatus(404)
+            req.technique = technique
+            next()
+        }
+    ]
 }
 
 export default Project

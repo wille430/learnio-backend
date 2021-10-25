@@ -1,5 +1,6 @@
 import { check, validationResult } from 'express-validator'
 import UserModel from '../models/User'
+import getUserFromId from '../services/getUserFromId'
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 
@@ -83,7 +84,7 @@ const User = {
                 if (!validPassword) {
                     throw new Error('Invalid password or username')
                 } else {
-                    return false
+                    return true
                 }
             }),
         async (req: any, res: any) => {
@@ -138,6 +139,26 @@ const User = {
             res.sendStatus(200)
         })
     },
+    validateProjectId: [
+        check('project_id')
+            .exists()
+            .withMessage("Project ID is required"),
+        async (req, res, next) => {
+            // Validate req
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+                return res.status(422).jsonp(errors.array())
+            }
+            const { project_id } = req.params
+
+            // Get technique
+            const user = await getUserFromId(req, res)
+            const project = user.projects.id(project_id)
+            if (!project) return res.sendStatus(404)
+            req.project = project
+            next()
+        }
+    ]
 }
 
 export default User
