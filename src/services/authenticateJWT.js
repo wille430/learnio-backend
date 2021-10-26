@@ -9,6 +9,7 @@ const authenticateJWT = (req, res, next) => {
         // Check if token is valid
         jwt.verify(token, process.env.TOKEN_KEY, (err, user) => {
             if (err) {
+                console.log(err)
                 return res.sendStatus(403)
             }
             req.user = user

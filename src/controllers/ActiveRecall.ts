@@ -6,6 +6,7 @@ const ActiveRecall = {
     createFlashcard: [
         check('question', 'Question cannot be empty')
             .exists(),
+        Project.validateTechniqueId,
         async (req: any, res: any) => {
             // Validate req
             const errors = validationResult(req)
@@ -14,11 +15,7 @@ const ActiveRecall = {
             }
 
             // Get technique
-            const {project_id, technique_id} = req.params
-            const user = await getUserFromId(req, res)
-            const technique = user.projects.id(project_id).techniques.id(technique_id)
-            if (!technique) return res.status(404).send('Could not find technique or project')
-
+            const { technique, project } = req
             // Get fields
             const { question, answer } = req.body
 
@@ -28,29 +25,46 @@ const ActiveRecall = {
                 answer: answer
             })
 
+
             technique.flashcards.push(newFlashcard)
+            project.techniques["spaced_repetition"].id(technique._id).remove()
+            project.techniques["spaced_repetition"].push(technique)
 
             // Save user
+            const user = await getUserFromId(req, res)
+            console.log({
+                new_project: project,
+                old_project: user.projects.id(project._id)
+            })
+
+            // remove old project
+            user.projects = user.projects.filter(x => x._id !== project._id)
+            // add new project
+            user.projects.push(JSON.parse(JSON.stringify(project)))
+            console.log({ new_user: user })
             await user.save()
 
+
             // Return OK
-            res.sendStatus(201)
+            res.status(201).json(newFlashcard)
         }
     ],
-    removeFlashcard: async (req: any, res: any) => {
-        const {project_id, technique_id, flashcard_id} = req.params
-        // Get technique
-        const user = await getUserFromId(req, res)
-        const technique = user.projects.id(project_id)?.techniques.id(technique_id)
-        if (!technique) return res.status(404).send('Could not find technique or project')
+    removeFlashcard: [
+        Project.validateTechniqueId,
+        async (req: any, res: any) => {
+            const { flashcard_id } = req.params
+            // Get technique
+            const user = await getUserFromId(req, res)
+            const { technique } = req
 
-        // Remove flashcard
-        technique.flashcards = technique.flashcards.pull(flashcard_id)
-        user.save((err) => {
-            if (err) return res.status(500).send(err.message)
-            res.sendStatus(200)
-        })
-    },
+            // Remove flashcard
+            technique.flashcards = technique.flashcards.pull(flashcard_id)
+            user.save((err) => {
+                if (err) return res.status(500).send(err.message)
+                res.sendStatus(200)
+            })
+        }
+    ],
 }
 
 export default ActiveRecall

@@ -19,8 +19,9 @@ router.post('/projects', authenticateJWT, Project.create)
 router.delete('/projects/:id', authenticateJWT, Project.delete)
 
 // Techniques
-router.get('/projects/:id/techniques', authenticateJWT, Technique.getAll)
-router.post('/projects/:id/techniques', authenticateJWT, Technique.create)
+router.get('/projects/:project_id/techniques', authenticateJWT, Technique.getAll)
+router.post('/projects/:project_id/techniques', authenticateJWT, Technique.create)
+// router.delete
 
 // Specific technique
 router.get('/projects/:project_id/:technique_id', authenticateJWT, Technique.getFromId)
