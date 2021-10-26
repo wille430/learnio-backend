@@ -17,7 +17,7 @@ const userRouter = require('./routes/user')
 app.use('/user', userRouter)
 
 app.get('/', (req, res) => {
-    res.send('Welcome to Express js')
+    res.send('Learn.io API')
 })
 
 const hostname = process.env.API_HOST || 'localhost'

@@ -1,5 +1,6 @@
 import { check, validationResult } from "express-validator"
 import getUserFromId from "../services/getUserFromId"
+import Project from "./Project"
 
 const ActiveRecall = {
     createFlashcard: [
