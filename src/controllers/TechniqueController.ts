@@ -1,7 +1,8 @@
 import { validationResult, check } from "express-validator"
 import getUserFromId from "../services/getUserFromId"
-import Project from "./Project"
-import User from "./User"
+import ProjectService from "../services/ProjectService"
+import Project from "./ProjectController"
+import User from "./UserController"
 
 const Technique = {
     getAll: [
@@ -28,27 +29,22 @@ const Technique = {
         }
     ],
     create: [
+        check("project_id", "Project ID is required")
+            .exists(),
         check('type', 'Type is not valid')
             .exists()
             .isIn(['spaced_repetition', 'feynman_technique', 'intervalled_training']),
-        User.validateProjectId,
         async (req: any, res: any) => {
             const errors = validationResult(req)
-
             if (!errors.isEmpty()) {
                 return res.status(422).jsonp(errors.array())
             }
 
-            const user = await getUserFromId(req, res)
-
+            const { user_id } = req.user
             const { type } = req.body
-            const { project } = req
+            const { project_id } = req.params
 
-            // Create new technique
-            const newTechnique = project.techniques[type].create({})
-            project.techniques[type].push(newTechnique)
-
-            user.save()
+            const newTechnique = await new ProjectService(user_id, project_id).addTechnique(type)
 
             res.status(201).json(newTechnique)
 

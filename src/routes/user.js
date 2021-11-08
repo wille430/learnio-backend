@@ -1,12 +1,11 @@
 const express = require('express')
 const router = express.Router()
 const authenticateJWT = require('../services/authenticateJWT')
-const { check } = require('express-validator')
 
-const { default: User } = require('../controllers/User')
-const { default: Project } = require('../controllers/Project')
-const { default: Technique } = require('../controllers/Technique')
-const { default: ActiveRecall } = require('../controllers/ActiveRecall')
+const { default: User } = require('../controllers/UserController')
+const { default: Project } = require('../controllers/ProjectController')
+const { default: Technique } = require('../controllers/TechniqueController')
+const { default: ActiveRecall } = require('../controllers/SpacedRepetitionController')
 
 // User Auth
 router.post('/login', User.login)

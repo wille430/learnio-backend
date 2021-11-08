@@ -1,6 +1,7 @@
 import { check, validationResult } from "express-validator"
-import getUserFromId from "../services/getUserFromId"
-import User from "./User"
+import ProjectService from "../services/ProjectService"
+import UserService from "../services/UserService"
+import User from "./UserController"
 
 
 const Project = {
@@ -27,24 +28,16 @@ const Project = {
                 return res.status(422).jsonp(errors.array())
             }
 
+            const { user_id } = req.user
             const { title, selectedTechniques } = req.body
 
-            // Get user and create new project
-            const user = await getUserFromId(req, res)
+            const newProject = await new ProjectService(user_id).create(title, selectedTechniques)
 
-            const newProject = user.projects.create({
-                title: title,
-                selectedTechniques: selectedTechniques
-            })
-
-            // Create techniques chosen in selectedTechniques
-            selectedTechniques.forEach(async techniqueVal => {
-                const newTechnique = await newProject.techniques[techniqueVal].create({})
-                newProject.techniques[techniqueVal].push(newTechnique)
-            })
-
-            user.projects.push(newProject)
-            await user.save()
+            // // Create techniques chosen in selectedTechniques
+            // selectedTechniques.forEach(async techniqueVal => {
+            //     const newTechnique = await newProject.techniques[techniqueVal].create({})
+            //     newProject.techniques[techniqueVal].push(newTechnique)
+            // })
 
             // Return OK
             res.status(201).json(newProject)
@@ -59,21 +52,15 @@ const Project = {
                 return res.status(422).jsonp(errors.array())
             }
 
-            const user = await getUserFromId(req, res)
+            const { user_id } = req.user
             const { project_id } = req.params
 
-            user.projects = user.projects.pull(project_id)
-            user.save()
+            await new ProjectService(user_id, project_id)
 
-            res.sendStatus(200)
         }
     ],
     getAll: async (req: any, res: any) => {
-        const user = await getUserFromId(req, res)
-
-        // Get user projects and return
-        const projects = user.projects
-
+        const projects = await new UserService(req.user.user_id).getAllProjects()
         res.status(200).json(projects)
     },
     validateTechniqueId: [

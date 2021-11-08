@@ -1,4 +1,4 @@
-import UserModel from '../models/User'
+import UserModel from '../models/UserModel'
 
 const getUserFromId = async (req: any, res: any): Promise<any> => {
     const { user_id } = req.user

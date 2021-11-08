@@ -1,32 +1,37 @@
-import User from "../models/User"
+import UserModel from "../models/UserModel"
+import ProjectService from "./ProjectService"
+import SpacedRepetitionService from "./SpacedRepetitionService"
 
-export default class FlashcardService {
+export default class FlashcardService extends SpacedRepetitionService {
 
     flashcards = []
+    flashcardId: string
 
-    user_id: string
-    project_id: string
-    technique_id: string
-
-    constructor(user_id, project_id, technique_id) {
-        this.user_id = user_id
-        this.project_id = project_id
-        this.technique_id = technique_id
+    constructor(userId, projectId, techniqueId, flashcardId) {
+        super(userId, projectId, techniqueId)
+        this.flashcardId = flashcardId
     }
 
-    async complete(flashcard_id, offsetDays = 7) {
-        await User.update(
-            {
-                _id: this.user_id,
-                "projects._id": this.project_id,
-                "projects.techniques.spaced_repetition._id": this.technique_id,
-                "projects.techniques.spaced_repetition.flashcards._id": flashcard_id
-            },
-            {
-                $set: {
-                    "projects.techniques.spaced_repetition.flashcards.nextAnswer": Date.now() + offsetDays*24*60*60*1000
-                }
-            }
-        )
+    async complete(offsetDays = 7) {
+        const user = await UserModel.findOne({_id: this.userId})
+        const flashcard = user.projects.id(this.projectId).techniques.spaced_repetition.id(this.techniqueId).flashcards.id(this.flashcardId)
+        flashcard.nextAnswer = Date.now() + offsetDays*24*60*60*1000
+
+        user.save((err) => {
+            if (err) throw err
+            console.log(`Flashcard ${this.projectId} completed!`)
+        })
+
+        return flashcard.nextAnswer
+    }
+
+    async delete(): Promise<void> {
+        const user = await UserModel.findOne({_id: this.userId})
+        user.projects.id(this.projectId).techniques.spaced_repetition.id(this.techniqueId).flashcards.pull(this.flashcardId)
+
+        user.save((err) => {
+            if (err) throw err
+            console.log(`Flashcard ${this.projectId} was deleted successfully!`)
+        })
     }
 }
