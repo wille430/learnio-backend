@@ -154,6 +154,7 @@ const User = {
             // Get technique
             const user = await getUserFromId(req, res)
             const project = user.projects.id(project_id)
+            console.log({projects: user.projects})
             if (!project) return res.sendStatus(404)
             req.project = project
             next()

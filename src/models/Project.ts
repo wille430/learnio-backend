@@ -1,9 +1,20 @@
 import mongoose from 'mongoose'
 
-export const flashcard = new mongoose.Schema({
+interface Flashcard {
+    question: string,
+    answer: string,
+    lastWrong: number,
+    nextAnswer: number,
+    stage: number,
+    createdAt: Date,
+    updatedAt: Date,
+}
+
+export const flashcard = new mongoose.Schema<Flashcard>({
     question: { type: String, required: true },
     answer: { type: String, default: '' },
-    lastWrong: { type: Date, default: Date.now() },
+    lastWrong: { type: Number, default: Date.now() },
+    nextAnswer: { type: Number, default: Date.now() },
     stage: { type: Number, default: 0 }
 }, {
     timestamps: true

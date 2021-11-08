@@ -1,4 +1,5 @@
 import { check, validationResult } from "express-validator"
+import FlashcardService from "../services/FlashcardService"
 import getUserFromId from "../services/getUserFromId"
 import Project from "./Project"
 
@@ -65,6 +66,34 @@ const ActiveRecall = {
             })
         }
     ],
+    completeFlashcard: [
+        check("project_id")
+            .exists()
+            .withMessage("Project ID must be provided"),
+        check("technique_id")
+            .exists()
+            .withMessage("Technique ID must be provided"),
+        check("flashcard_id")
+            .exists()
+            .withMessage("Flashcard ID must be provided"),
+        async (req, res) => {
+            // Validate req
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+                return res.status(422).jsonp(errors.array())
+            }
+
+            const { user_id } = req.user
+            const { project_id, technique_id, flashcard_id } = req.body
+
+            try {
+                await new FlashcardService(user_id, project_id, technique_id).complete(flashcard_id)
+                res.sendStatus(200)
+            } catch (e) {
+                res.status(500).send(e.message)
+            }
+        }
+    ]
 }
 
 export default ActiveRecall

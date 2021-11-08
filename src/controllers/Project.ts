@@ -50,15 +50,24 @@ const Project = {
             res.status(201).json(newProject)
         }
     ],
-    delete: async (req: any, res: any) => {
-        const user = await getUserFromId(req, res)
-        const project_id = req.params.id
+    delete: [
+        check("project_id", "Project ID is required"),
+        async (req: any, res: any) => {
+            // Validate req
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+                return res.status(422).jsonp(errors.array())
+            }
 
-        user.projects = user.projects.pull(project_id)
-        user.save()
+            const user = await getUserFromId(req, res)
+            const { project_id } = req.params
 
-        res.sendStatus(200)
-    },
+            user.projects = user.projects.pull(project_id)
+            user.save()
+
+            res.sendStatus(200)
+        }
+    ],
     getAll: async (req: any, res: any) => {
         const user = await getUserFromId(req, res)
 
