@@ -1,8 +1,8 @@
-import { Flashcard } from "../models/Project";
+import { Flashcard } from "../models/ProjectModel";
 import UserModel from "../models/UserModel";
-import Technique from "./Technique";
+import TechniqueService from "./TechniqueService";
 
-export default class SpacedRepetitionService extends Technique {
+export default class SpacedRepetitionService extends TechniqueService {
     type = "spaced_repetition"
 
     constructor(userId, projectId, techniqueId) {

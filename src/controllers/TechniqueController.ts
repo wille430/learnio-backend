@@ -1,6 +1,7 @@
 import { validationResult, check } from "express-validator"
 import getUserFromId from "../services/getUserFromId"
 import ProjectService from "../services/ProjectService"
+import TechniqueService from "../services/TechniqueService"
 import Project from "./ProjectController"
 import User from "./UserController"
 
@@ -50,6 +51,27 @@ const Technique = {
 
         }
     ],
+    delete: [
+        check("project_id", "Project ID is required")
+            .exists(),
+        check("technique_id", "Technique ID is required")
+            .exists(),
+        async (req, res) => {
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+                return res.status(422).jsonp(errors.array())
+            }
+
+            const { user_id } = req.user
+            const { project_id, technique_id } = req.params
+
+            console.log(user_id, project_id, technique_id)
+
+            await new TechniqueService(user_id, project_id, technique_id).delete()
+
+            res.sendStatus(200)
+        }
+    ]
 }
 
 

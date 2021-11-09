@@ -1,4 +1,4 @@
-import { Project } from "../models/Project";
+import { Project } from "../models/ProjectModel";
 import UserModel from "../models/UserModel";
 import UserService from "./UserService";
 

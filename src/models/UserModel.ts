@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
-import { Project, ProjectModel, projectSchema } from '../models/Project'
+import { Project, ProjectModel, projectSchema } from './ProjectModel'
 
-interface User extends Document {
+export interface User extends Document {
     username: string,
     password: string,
     projects: mongoose.Types.DocumentArray<Project>

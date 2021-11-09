@@ -20,7 +20,7 @@ router.delete('/projects/:project_id', authenticateJWT, Project.delete)
 // Techniques
 router.get('/projects/:project_id/techniques', authenticateJWT, Technique.getAll)
 router.post('/projects/:project_id/techniques', authenticateJWT, Technique.create)
-// router.delete
+router.delete('/projects/:project_id/:technique_id', authenticateJWT, Technique.delete)
 
 // Specific technique
 router.get('/projects/:project_id/:technique_id', authenticateJWT, Technique.getFromId)

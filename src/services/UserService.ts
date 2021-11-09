@@ -1,4 +1,4 @@
-import UserModel from "../models/UserModel"
+import UserModel, { User } from "../models/UserModel"
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import InputError from "./InputError"
@@ -10,7 +10,18 @@ export default class UserService {
         this.userId = userId
     }
 
-    static async login(username, password): Promise<string | null> {
+    async user(): Promise<User> {
+        const user: User = await UserModel.findOne({ _id: this.userId })
+        return user
+    }
+
+    async saveUser(user): Promise<void> {
+        await user.save((err) => {
+            if (err) throw err
+        })
+    }
+
+    static async login(username: string, password: string): Promise<string | null> {
         // Find user
         const user = await UserModel.findOne({ username })
 
