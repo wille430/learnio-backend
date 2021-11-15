@@ -15,6 +15,7 @@ router.post('/validateToken', User.validateToken)
 // Projects
 router.get('/projects', authenticateJWT, Project.getAll)
 router.post('/projects', authenticateJWT, Project.create)
+router.get('/projects/:project_id', authenticateJWT, Project.getFromId)
 router.delete('/projects/:project_id', authenticateJWT, Project.delete)
 
 // Techniques

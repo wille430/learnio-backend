@@ -63,6 +63,12 @@ const Project = {
         const projects = await new UserService(req.user.user_id).getAllProjects()
         res.status(200).json(projects)
     },
+    getFromId: async (req, res) => {
+        const { user_id } = req.user
+        const { project_id } = req.params
+        const projects = await new ProjectService(user_id, project_id).get()
+        res.status(200).json(projects)
+    },
     validateTechniqueId: [
         check("technique_id", "Technique ID cannot be empty")
             .exists(),
