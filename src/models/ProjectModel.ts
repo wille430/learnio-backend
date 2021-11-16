@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose, { ObjectId } from 'mongoose'
 
 export interface Flashcard extends mongoose.Types.Subdocument {
     question: string,
@@ -30,26 +30,16 @@ export const spacedRepetitionSchema = new mongoose.Schema<SpacedRepetition>({
     techniqueType: { type: String, default: 'spaced_repetition' },
     flashcards: [flashcard]
 })
-export const feynmanTechniqueSchema = new mongoose.Schema({
-    techniqueType: { type: String, default: 'feynman_technique' },
-    flashcards: [flashcard]
-})
-
-export const techniqueSchema = new mongoose.Schema({
-    data: spacedRepetitionSchema
-}, {
-    timestamps: true
-})
 
 
 export interface Project extends mongoose.Types.Subdocument {
-    _id?: string,
+    _id: ObjectId,
     title: string,
     selectedTechniques: string[],
     techniques?: {
         'spaced_repetition': mongoose.Types.DocumentArray<SpacedRepetition>,
-        'feynman_technique': any[],
-        'intervalled_training': any[]
+        'feynman_technique': mongoose.Types.DocumentArray<SpacedRepetition>,
+        'intervalled_training': mongoose.Types.DocumentArray<SpacedRepetition>
     }
 }
 
@@ -63,8 +53,8 @@ export const projectSchema = new mongoose.Schema<Project>({
     selectedTechniques: [{ type: String, enum: ['spaced_repetition', 'feynman_technique', 'intervalled_training'] }],
     techniques: {
         'spaced_repetition': [spacedRepetitionSchema],
-        'feynman_technique': [feynmanTechniqueSchema],
-        'intervalled_training': [feynmanTechniqueSchema]
+        'feynman_technique': [spacedRepetitionSchema],
+        'intervalled_training': [spacedRepetitionSchema]
     }
 }, {
     timestamps: true

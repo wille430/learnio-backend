@@ -1,5 +1,6 @@
 import { check, validationResult } from "express-validator"
 import ProjectService from "../services/ProjectService"
+import TechniqueService from "../services/TechniqueService"
 import UserService from "../services/UserService"
 import User from "./UserController"
 
@@ -32,12 +33,6 @@ const Project = {
             const { title, selectedTechniques } = req.body
 
             const newProject = await new ProjectService(user_id).create(title, selectedTechniques)
-
-            // // Create techniques chosen in selectedTechniques
-            // selectedTechniques.forEach(async techniqueVal => {
-            //     const newTechnique = await newProject.techniques[techniqueVal].create({})
-            //     newProject.techniques[techniqueVal].push(newTechnique)
-            // })
 
             // Return OK
             res.status(201).json(newProject)
