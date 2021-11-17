@@ -5,7 +5,7 @@ const authenticateJWT = require('../services/authenticateJWT')
 const { default: User } = require('../controllers/UserController')
 const { default: Project } = require('../controllers/ProjectController')
 const { default: Technique } = require('../controllers/TechniqueController')
-const { default: ActiveRecall } = require('../controllers/SpacedRepetitionController')
+const { default: ActiveRecall } = require('../controllers/FlashcardsController')
 
 // User Auth
 router.post('/login', User.login)

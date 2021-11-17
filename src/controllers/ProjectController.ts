@@ -14,11 +14,11 @@ const Project = {
             .isArray({ min: 1 })
             .withMessage('You must select a technique')
             .custom(selectedTechniques => {
-                const enums = ['spaced_repetition', 'feynman_technique', 'intervalled_training']
+                const enums = ['flashcards']
                 let valid_input = selectedTechniques.every(x => enums.includes(x))
 
                 if (!valid_input) {
-                    throw new Error("Invalid techniques. Valid techniques are: spaced_repetition, feynman_technique, intervalled_training")
+                    throw new Error("Invalid techniques. Valid techniques are: flashcards")
                 }
                 return true
             }),

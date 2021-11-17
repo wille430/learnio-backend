@@ -1,4 +1,4 @@
-import { Project } from "../models/ProjectModel";
+import { Flashcard, Project } from "../models/ProjectModel";
 import UserModel from "../models/UserModel";
 import UserService from "./UserService";
 
@@ -15,7 +15,7 @@ export default class ProjectService extends UserService {
 
         const newProject = user.projects.create({
             title: projectName,
-            selectedTechniques: selectedTechniques
+            selectedTechniques
         })
 
         user.projects.push(newProject)
@@ -29,11 +29,11 @@ export default class ProjectService extends UserService {
 
 
         // Create techniques chosen in selectedTechniques
-        newProject.selectedTechniques.forEach(async techniqueVal => {
-            await new ProjectService(this.userId, newProject._id.toString()).addTechnique(techniqueVal)
-            // const newTechnique = await newProject.techniques[techniqueVal].create({})
-            // newProject.techniques[techniqueVal].push(newTechnique)
-        })
+        // newProject.selectedTechniques.forEach(async techniqueVal => {
+        //     await new ProjectService(this.userId, newProject._id.toString()).addTechnique(techniqueVal)
+        //     // const newTechnique = await newProject.techniques[techniqueVal].create({})
+        //     // newProject.techniques[techniqueVal].push(newTechnique)
+        // })
         return newProject
 
     }
@@ -71,5 +71,24 @@ export default class ProjectService extends UserService {
         const project = user.projects.id({ _id: this.projectId })
 
         return project
+    }
+
+    async createFlashcard(question, answer): Promise<Flashcard> {
+        const user = await UserModel.findOne({ _id: this.userId })
+        const flashcardsArray = user.projects.id(this.projectId).techniques.flashcards
+
+        const newFlashcard = flashcardsArray.create({
+            question: question,
+            answer: answer
+        })
+
+        user.projects.id(this.projectId).techniques.flashcards.push(newFlashcard)
+
+        user.save((err) => {
+            if (err) throw err
+            console.log(`Flashcard ${newFlashcard._id} was successfully created!`)
+        })
+
+        return newFlashcard
     }
 }

@@ -1,8 +1,6 @@
 import { check, validationResult } from "express-validator"
 import FlashcardService from "../services/FlashcardService"
-import getUserFromId from "../services/getUserFromId"
-import SpacedRepetitionService from "../services/SpacedRepetitionService"
-import Project from "./ProjectController"
+import ProjectService from "../services/ProjectService"
 
 const ActiveRecall = {
     createFlashcard: [
@@ -27,7 +25,7 @@ const ActiveRecall = {
             const { project_id, technique_id } = req.params
             const { question, answer } = req.body
 
-            const newFlashcard = new SpacedRepetitionService(user_id, project_id, technique_id).createFlashcard(question, answer)
+            const newFlashcard = new ProjectService(user_id, project_id).createFlashcard(question, answer)
 
 
             // Return OK
@@ -48,7 +46,7 @@ const ActiveRecall = {
             const { user_id } = req.user
             const { project_id, technique_id, flashcard_id } = req.params
 
-            await new FlashcardService(user_id, project_id, technique_id, flashcard_id).delete()
+            await new FlashcardService(user_id, project_id, flashcard_id).delete()
 
             res.sendStatus(200)
         }
@@ -73,7 +71,7 @@ const ActiveRecall = {
             const { user_id } = req.user
             const { project_id, technique_id, flashcard_id } = req.params
 
-            await new FlashcardService(user_id, project_id, technique_id, flashcard_id).complete()
+            await new FlashcardService(user_id, project_id, flashcard_id).complete()
         }
     ]
 }
