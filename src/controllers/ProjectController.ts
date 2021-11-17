@@ -50,7 +50,9 @@ const Project = {
             const { user_id } = req.user
             const { project_id } = req.params
 
-            await new ProjectService(user_id, project_id)
+            await new ProjectService(user_id, project_id).delete()
+
+            res.sendStatus(200)
 
         }
     ],
@@ -78,7 +80,7 @@ const Project = {
 
             // Get technique
             const { project } = req
-            console.log({ project })
+            
             let technique;
             Object.keys(project.techniques).forEach(tech_type => {
                 project.techniques[tech_type].forEach(tech => tech.id === technique_id ? technique = tech : false)

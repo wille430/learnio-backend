@@ -91,4 +91,11 @@ export default class ProjectService extends UserService {
 
         return newFlashcard
     }
+
+
+    async getAllFlashcards() {
+        const user = await UserModel.findOne({ _id: this.userId })
+
+        return user.projects.id(this.projectId).techniques.flashcards
+    }
 }

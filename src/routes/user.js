@@ -5,7 +5,7 @@ const authenticateJWT = require('../services/authenticateJWT')
 const { default: User } = require('../controllers/UserController')
 const { default: Project } = require('../controllers/ProjectController')
 const { default: Technique } = require('../controllers/TechniqueController')
-const { default: ActiveRecall } = require('../controllers/FlashcardsController')
+const { default: FlashcardsController } = require('../controllers/FlashcardsController')
 
 // User Auth
 router.post('/login', User.login)
@@ -24,9 +24,9 @@ router.post('/projects/:project_id/techniques', authenticateJWT, Technique.creat
 router.delete('/projects/:project_id/:technique_id', authenticateJWT, Technique.delete)
 
 // Specific technique
-router.get('/projects/:project_id/:technique_id', authenticateJWT, Technique.getFromId)
-router.post('/projects/:project_id/:technique_id/active_recall', authenticateJWT, ActiveRecall.createFlashcard)
-router.delete('/projects/:project_id/:technique_id/active_recall/:flashcard_id', authenticateJWT, ActiveRecall.removeFlashcard)
-router.post('/projects/:project_id/:technique_id/active_recall/:flashcard_id/complete', authenticateJWT, ActiveRecall.completeFlashcard)
+router.get('/projects/:project_id/flashcards', authenticateJWT, FlashcardsController.getAll)
+router.post('/projects/:project_id/flashcards', authenticateJWT, FlashcardsController.createFlashcard)
+router.delete('/projects/:project_id/flashcards/:flashcard_id', authenticateJWT, FlashcardsController.removeFlashcard)
+router.post('/projects/:project_id/flashcards/:flashcard_id/complete', authenticateJWT, FlashcardsController.completeFlashcard)
 
 module.exports = router
