@@ -60,9 +60,11 @@ const ActiveRecall = {
             }
 
             const { user_id } = req.user
-            const { project_id, technique_id, flashcard_id } = req.params
+            const { project_id, flashcard_id } = req.params
 
             await new FlashcardService(user_id, project_id, flashcard_id).complete()
+
+            res.sendStatus(200)
         }
     ],
     getAll: [
@@ -83,7 +85,15 @@ const ActiveRecall = {
 
             res.status(200).json(flashcards)
         }
-    ]
+    ],
+    next: async (req, res) => {
+        const { user_id } = req.user
+        const { project_id } = req.params
+
+        const nextFlashcard = await new ProjectService(user_id, project_id).getNextFlashcard()
+
+        res.status(200).json(nextFlashcard)
+    }
 }
 
 export default ActiveRecall

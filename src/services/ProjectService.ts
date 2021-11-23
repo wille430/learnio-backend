@@ -98,4 +98,12 @@ export default class ProjectService extends UserService {
 
         return user.projects.id(this.projectId).techniques.flashcards
     }
+
+    async getNextFlashcard() {
+        const user = await this.user()
+
+        return user.projects.id(this.projectId).techniques.flashcards.sort((a, b) => {
+            return a.nextAnswer - b.nextAnswer
+        })[0]
+    }
 }

@@ -24,6 +24,7 @@ router.post('/projects/:project_id/techniques', authenticateJWT, Technique.creat
 router.delete('/projects/:project_id/:technique_id', authenticateJWT, Technique.delete)
 
 // Specific technique
+router.get('/projects/:project_id/flashcards/next', authenticateJWT, FlashcardsController.next)
 router.get('/projects/:project_id/flashcards', authenticateJWT, FlashcardsController.getAll)
 router.post('/projects/:project_id/flashcards', authenticateJWT, FlashcardsController.createFlashcard)
 router.delete('/projects/:project_id/flashcards/:flashcard_id', authenticateJWT, FlashcardsController.removeFlashcard)
