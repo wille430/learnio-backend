@@ -107,9 +107,9 @@ export default class ProjectService extends UserService {
         })[0]
 
         if (nextFlashcard.nextAnswer > Date.now()) {
-            return nextFlashcard
-        } else {
             return null
+        } else {
+            return nextFlashcard
         }
     }
 }
