@@ -35,6 +35,8 @@ export default class FlashcardService extends ProjectService {
                 nextAnswer += daysInMs/24 // Next answer an hour in the future
         }
 
+        flashcard.nextAnswer = nextAnswer
+
         user.save((err) => {
             if (err) throw err
             console.log(`Flashcard ${this.projectId} completed!`)
