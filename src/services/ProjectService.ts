@@ -102,8 +102,14 @@ export default class ProjectService extends UserService {
     async getNextFlashcard() {
         const user = await this.user()
 
-        return user.projects.id(this.projectId).techniques.flashcards.sort((a, b) => {
+        const nextFlashcard = user.projects.id(this.projectId).techniques.flashcards.sort((a, b) => {
             return a.nextAnswer - b.nextAnswer
         })[0]
+
+        if (nextFlashcard.nextAnswer > Date.now()) {
+            return nextFlashcard
+        } else {
+            return null
+        }
     }
 }

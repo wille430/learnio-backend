@@ -52,6 +52,11 @@ const ActiveRecall = {
         check("flashcard_id")
             .exists()
             .withMessage("Flashcard ID must be provided"),
+        check("difficulty")
+            .exists()
+            .withMessage("Difficulty must be provided")
+            .isFloat({ min: 0, max: 3 })
+            .withMessage("Difficulty must be between 0 and 3"),
         async (req, res) => {
             // Validate req
             const errors = validationResult(req)
@@ -61,8 +66,9 @@ const ActiveRecall = {
 
             const { user_id } = req.user
             const { project_id, flashcard_id } = req.params
+            const { difficulty } = req.body
 
-            await new FlashcardService(user_id, project_id, flashcard_id).complete()
+            await new FlashcardService(user_id, project_id, flashcard_id).complete(difficulty)
 
             res.sendStatus(200)
         }
