@@ -62,6 +62,25 @@ const PublicProjectsService = {
         })
 
         return publicProject
+    },
+    getAll: async () => {
+        const projects = await PublicProjectModel.find({})
+
+        const projectsWithOwnerUsername = await Promise.all(projects.filter(project => !!project.owner).map(async (project) => {
+            console.log(project.owner)
+
+            const user = await UserModel.findById(project.owner)
+            const username = user?.username || 'Deleted user'
+
+            return ({
+                ...project.toObject(),
+                owner: username
+            })
+        }))
+
+        console.log(projectsWithOwnerUsername)
+
+        return projectsWithOwnerUsername
     }
 }
 

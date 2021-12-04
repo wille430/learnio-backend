@@ -34,5 +34,6 @@ router.post('/projects/:project_id/flashcards/:flashcard_id/complete', authentic
 // Public Projects
 router.post('/publicprojects/:public_project_id/add', authenticateJWT, PublicProjectsController.copyPublicProject)
 router.post('/publicprojects/share', authenticateJWT, PublicProjectsController.makePublic)
+router.get('/publicprojects', authenticateJWT, PublicProjectsController.getAll)
 
 module.exports = router

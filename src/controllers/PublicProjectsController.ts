@@ -1,4 +1,5 @@
 import { check, validationResult } from "express-validator"
+import PublicProjectModel from "../models/PublicProjectModel"
 import ProjectService from "../services/ProjectService"
 import PublicProjectsService from "../services/PublicProjectsService"
 
@@ -37,7 +38,12 @@ const PublicProjectsController = {
 
             res.sendStatus(200)
         }
-    ]
+    ],
+    getAll: async (req, res) => {
+        const projects = await PublicProjectsService.getAll()
+
+        res.json(projects)
+    }
 }
 
 export default PublicProjectsController
