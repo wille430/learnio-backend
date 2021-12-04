@@ -7,7 +7,7 @@ import User from "./UserController"
 
 const Technique = {
     getAll: [
-        User.validateProjectId,
+        User.validateproject_id,
         async (req: any, res: any) => {
             // Get techniques in project
             const { project } = req

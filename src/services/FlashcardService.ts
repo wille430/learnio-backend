@@ -6,14 +6,14 @@ export default class FlashcardService extends ProjectService {
     flashcards = []
     flashcardId: string
 
-    constructor(userId, projectId, flashcardId) {
-        super(userId, projectId)
+    constructor(userId, project_id, flashcardId) {
+        super(userId, project_id)
         this.flashcardId = flashcardId
     }
 
     async complete(difficulty: (0|1|2|3)) {
         const user = await UserModel.findOne({_id: this.userId})
-        const flashcard = user.projects.id(this.projectId).techniques.flashcards.id(this.flashcardId)
+        const flashcard = user.projects.id(this.project_id).techniques.flashcards.id(this.flashcardId)
         flashcard.stage += 1
 
 
@@ -39,7 +39,7 @@ export default class FlashcardService extends ProjectService {
 
         user.save((err) => {
             if (err) throw err
-            console.log(`Flashcard ${this.projectId} completed!`)
+            console.log(`Flashcard ${this.project_id} completed!`)
         })
 
         return flashcard.nextAnswer
@@ -47,11 +47,11 @@ export default class FlashcardService extends ProjectService {
 
     async delete(): Promise<void> {
         const user = await UserModel.findOne({_id: this.userId})
-        user.projects.id(this.projectId).techniques.flashcards.pull(this.flashcardId)
+        user.projects.id(this.project_id).techniques.flashcards.pull(this.flashcardId)
 
         user.save((err) => {
             if (err) throw err
-            console.log(`Flashcard ${this.projectId} was deleted successfully!`)
+            console.log(`Flashcard ${this.project_id} was deleted successfully!`)
         })
     }
 }

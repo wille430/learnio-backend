@@ -89,7 +89,7 @@ const User = {
             res.sendStatus(200)
         })
     },
-    validateProjectId: [
+    validateproject_id: [
         check('project_id')
             .exists()
             .withMessage("Project ID is required"),

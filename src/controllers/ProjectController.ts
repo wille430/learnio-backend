@@ -69,7 +69,7 @@ const Project = {
     validateTechniqueId: [
         check("technique_id", "Technique ID cannot be empty")
             .exists(),
-        User.validateProjectId,
+        User.validateproject_id,
         async (req, res, next) => {
             // Validate req
             const errors = validationResult(req)

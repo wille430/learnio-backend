@@ -3,11 +3,11 @@ import UserModel from "../models/UserModel";
 import UserService from "./UserService";
 
 export default class ProjectService extends UserService {
-    projectId: string
+    project_id: string
 
-    constructor(userId: string, projectId?: string) {
+    constructor(userId: string, project_id?: string) {
         super(userId)
-        this.projectId = projectId
+        this.project_id = project_id
     }
 
     async create(projectName: string, selectedTechniques: string[]): Promise<Project> {
@@ -44,7 +44,7 @@ export default class ProjectService extends UserService {
 
         const newTechnique = project.techniques[type].create({})
 
-        user.projects.id(this.projectId).techniques[type].push(newTechnique)
+        user.projects.id(this.project_id).techniques[type].push(newTechnique)
 
         user.save((err) => {
             if (err) throw err
@@ -56,32 +56,32 @@ export default class ProjectService extends UserService {
 
     async delete(): Promise<void> {
         const user = await UserModel.findOne({ _id: this.userId })
-        user.projects.pull({ _id: this.projectId })
+        user.projects.pull({ _id: this.project_id })
 
         user.save((err) => {
             if (err) throw err
-            console.log(`Project ${this.projectId} was successfully deleted!`)
+            console.log(`Project ${this.project_id} was successfully deleted!`)
         })
 
     }
 
     async get(): Promise<Project> {
-        const user = await UserModel.findOne({ _id: this.userId })
-        const project = user.projects.id(this.projectId)
+        const user = await UserModel.findById(this.userId)
+        const project = user.projects.id(this.project_id)
 
         return project
     }
 
     async createFlashcard(question, answer): Promise<Flashcard> {
-        const user = await UserModel.findOne({ _id: this.userId })
-        const flashcardsArray = user.projects.id(this.projectId).techniques.flashcards
+        const user = await UserModel.findById(this.userId)
+        const flashcardsArray = user.projects.id(this.project_id).techniques.flashcards
 
         const newFlashcard = flashcardsArray.create({
             question: question,
             answer: answer
         })
 
-        user.projects.id(this.projectId).techniques.flashcards.push(newFlashcard)
+        user.projects.id(this.project_id).techniques.flashcards.push(newFlashcard)
 
         user.save((err) => {
             if (err) throw err
@@ -93,15 +93,20 @@ export default class ProjectService extends UserService {
 
 
     async getAllFlashcards() {
-        const user = await UserModel.findOne({ _id: this.userId })
+        const user = await UserModel.findById(this.userId)
 
-        return user.projects.id(this.projectId).techniques.flashcards
+        try {
+            return user.projects.id(this.project_id).techniques.flashcards
+        } catch (e) {
+            console.log(e)
+            return []
+        }
     }
 
     async getNextFlashcard() {
         const user = await this.user()
 
-        const nextFlashcard = user.projects.id(this.projectId).techniques.flashcards.sort((a, b) => {
+        const nextFlashcard = user.projects.id(this.project_id).techniques.flashcards.sort((a, b) => {
             return a.nextAnswer - b.nextAnswer
         })[0]
 

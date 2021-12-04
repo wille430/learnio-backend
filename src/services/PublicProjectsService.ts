@@ -17,9 +17,9 @@ const PublicProjectsService = {
             publicProject: newPublicProject
         }
     },
-    createShareUrl: async (projectId: string) => {
+    createShareUrl: async (project_id: string) => {
         // Find project
-        const publicProject = await PublicProjectModel.findById(projectId)
+        const publicProject = await PublicProjectModel.findById(project_id)
 
         // Create share url
         const shareUrl = `/publicprojects/${publicProject._id}/add`
