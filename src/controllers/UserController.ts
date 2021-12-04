@@ -54,9 +54,13 @@ const User = {
             .exists()
             .withMessage('Password cannot be empty')
             .custom(async (password, { req }) => {
-                const { username } = req.body                
-                const passwordMatches = await UserService.passwordMatches(username, password)
-                if (!passwordMatches) throw new Error("Invalid username or password")
+                try {
+                    const { username } = req.body
+                    const passwordMatches = await UserService.passwordMatches(username, password)
+                    if (!passwordMatches) throw new Error("Invalid username or password")
+                } catch (e) {
+                    throw new Error("An error occured")
+                }
             }),
         async (req: any, res: any) => {
             // Validate input
@@ -71,6 +75,7 @@ const User = {
             const token = await UserService.login(username, password)
 
             res.status(200).send(token)
+
         }
     ],
     validateToken: async (req, res) => {
