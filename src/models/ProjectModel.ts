@@ -1,4 +1,4 @@
-import mongoose, { ObjectId } from 'mongoose'
+import mongoose from 'mongoose'
 
 export interface Flashcard extends mongoose.Types.Subdocument {
     question: string,
@@ -21,17 +21,16 @@ export const flashcard = new mongoose.Schema<Flashcard>({
 })
 
 
-
-
-
-export interface Project extends mongoose.Types.Subdocument {
-    _id: ObjectId,
+export interface ProjectData {
+    _id: string,
     title: string,
     selectedTechniques: string[],
     techniques?: {
         flashcards: mongoose.Types.DocumentArray<Flashcard>
     }
 }
+
+export type Project = ProjectData & mongoose.Types.Subdocument
 
 export interface ProjectModel {
     projects: mongoose.Types.Array<Project>

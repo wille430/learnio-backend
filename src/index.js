@@ -20,9 +20,9 @@ app.get('/', (req, res) => {
     res.send('Learn.io API')
 })
 
-const hostname = process.env.API_HOST || 'localhost'
+const hostname = process.env.API_HOST || '0.0.0.0'
 const port = process.env.API_PORT || 3000
 
 app.listen(port, hostname, () => {
-    console.log('Express js app listening on port', port)
+    console.log(`Listening on ${hostname}:${port}`)
 })

@@ -1,6 +1,21 @@
-import { projectSchema, ProjectModel } from "./ProjectModel";
+import { flashcard, Project, ProjectData } from "./ProjectModel";
 import mongoose from 'mongoose'
 
-export const publicProjectSchema = projectSchema
+export interface PublicProject extends ProjectData {
+    owner: string,
+    shareUrl?: string
+}
 
-export default ProjectModel.discriminator('public')
+export const publicProjectSchema = new mongoose.Schema<PublicProject>({
+    title: { type: String },
+    selectedTechniques: [{ type: String, enum: ['flashcards'] }],
+    techniques: {
+        'flashcards': [flashcard],
+    },
+    shareUrl: { type: String },
+    owner: { type: String }
+}, {
+    timestamps: true
+})
+
+export default mongoose.model('publicProjects', publicProjectSchema)

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const { MONGO_URI, MONGO_USERNAME, MONGO_PASSWORD } = process.env
-const url = 'mongodb://localhost:27017';
+const url = 'mongodb://127.0.0.1:27017';
 
 exports.connect = () => {
     // Connecting to the database

@@ -6,6 +6,7 @@ const { default: User } = require('../controllers/UserController')
 const { default: Project } = require('../controllers/ProjectController')
 const { default: Technique } = require('../controllers/TechniqueController')
 const { default: FlashcardsController } = require('../controllers/FlashcardsController')
+const { default: PublicProjectsController } = require('../controllers/PublicProjectsController')
 
 // User Auth
 router.post('/login', User.login)
@@ -29,5 +30,9 @@ router.get('/projects/:project_id/flashcards', authenticateJWT, FlashcardsContro
 router.post('/projects/:project_id/flashcards', authenticateJWT, FlashcardsController.createFlashcard)
 router.delete('/projects/:project_id/flashcards/:flashcard_id', authenticateJWT, FlashcardsController.removeFlashcard)
 router.post('/projects/:project_id/flashcards/:flashcard_id/complete', authenticateJWT, FlashcardsController.completeFlashcard)
+
+// Public Projects
+router.post('/publicprojects/:public_project_id/add', authenticateJWT, PublicProjectsController.copyPublicProject)
+router.post('/publicprojects/share', authenticateJWT, PublicProjectsController.makePublic)
 
 module.exports = router

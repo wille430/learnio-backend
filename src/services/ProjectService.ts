@@ -67,8 +67,7 @@ export default class ProjectService extends UserService {
 
     async get(): Promise<Project> {
         const user = await UserModel.findOne({ _id: this.userId })
-
-        const project = user.projects.id({ _id: this.projectId })
+        const project = user.projects.id(this.projectId)
 
         return project
     }
