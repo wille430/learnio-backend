@@ -20,9 +20,20 @@ const PublicProjectsController = {
 
             const project = await new ProjectService(user_id, project_id).get()
 
-            const data = await PublicProjectsService.createPublicProject(user_id, project)
+            try {
+                const data = await PublicProjectsService.createPublicProject(user_id, project)
 
-            res.status(201).json(data)
+                res.status(201).json(data)
+            } catch (e) {
+                res.status(409).json({
+                    errors: [
+                        {
+                            param: 'all',
+                            msg: e.message
+                        }
+                    ]
+                })
+            }
         }
     ],
     copyPublicProject: [
@@ -34,9 +45,20 @@ const PublicProjectsController = {
             const { user_id } = req.user
             const { public_project_id } = req.params
 
-            await PublicProjectsService.copyPublicProject(user_id, public_project_id)
+            try {
+                await PublicProjectsService.copyPublicProject(user_id, public_project_id)
 
-            res.sendStatus(200)
+                res.sendStatus(200)
+            } catch (e) {
+                res.status(409).json({
+                    errors: [
+                        {
+                            param: 'all',
+                            msg: e.message
+                        }
+                    ]
+                })
+            }
         }
     ],
     getAll: async (req, res) => {

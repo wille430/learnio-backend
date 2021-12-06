@@ -4,10 +4,15 @@ import PublicProjectModel, { PublicProject } from "../models/PublicProjectModel"
 import UserModel from "../models/UserModel"
 
 const PublicProjectsService = {
-    createPublicProject: async (user_id: string, project: Project): Promise<{ shareUrl: string, publicProject: PublicProject }> => {
+    createPublicProject: async (user_id: string, project: Project): Promise<{ shareUrl: string, publicProject: PublicProject } | null> => {
         const publicProject = PublicProjectsService.convertRegularProjectToPublicProject(user_id, project)
+        const existingProjects = await PublicProjectModel.count({ publicId: project._id })
 
-        console.log({ publicProject })
+        if (project.isCopy) {
+            throw new Error('Origin type of project is public and cannot be converted to a public project')
+        } else if (existingProjects >= 1) {
+            throw new Error('Project is already public')
+        }
 
         const newPublicProject = await PublicProjectModel.create(publicProject)
         const shareUrl = await PublicProjectsService.createShareUrl(newPublicProject._id)
@@ -34,10 +39,23 @@ const PublicProjectsService = {
     copyPublicProject: async (user_id: string, public_project_id: string): Promise<void> => {
         const publicProject = await PublicProjectModel.findById(public_project_id)
         const user = await UserModel.findById(user_id)
+        const projectWithPublicId = user.projects.find(project => project.publicId === public_project_id)
 
-        user.projects.push(publicProject)
+        if (Boolean(projectWithPublicId)) {
+            throw new Error('Public project already exists in user projects')
+        }
 
-        await user.save()
+        if (user.username !== publicProject.owner) {
+            user.projects.push({
+                ...publicProject.toObject(),
+                _id: new mongoose.Types.ObjectId(),
+                publicOwner: publicProject.owner,
+                publicId: publicProject._id,
+                isCopy: true
+            })
+
+            await user.save()
+        }
     },
     convertRegularProjectToPublicProject: (owner_id: string, project: Project): PublicProject => {
         const publicProject = {
@@ -45,8 +63,6 @@ const PublicProjectsService = {
             owner: owner_id
         }
         delete publicProject._id
-
-        console.log(publicProject)
 
         // Clear flashcard dates
         // @ts-ignore

@@ -28,6 +28,9 @@ export interface ProjectData {
     techniques?: {
         flashcards: mongoose.Types.DocumentArray<Flashcard>
     }
+    isCopy?: boolean,
+    publicOwner?: string,
+    publicId?: string
 }
 
 export type Project = ProjectData & mongoose.Types.Subdocument
@@ -41,7 +44,10 @@ export const projectSchema = new mongoose.Schema<Project>({
     selectedTechniques: [{ type: String, enum: ['flashcards'] }],
     techniques: {
         'flashcards': [flashcard],
-    }
+    },
+    isCopy: { type: Boolean },
+    publicOwner: { type: String },
+    publicId: { type: String }
 }, {
     timestamps: true
 })
